@@ -14,6 +14,17 @@ const color = {
   p1t: "#A3CE27"
 }
 
+const keybinds = {
+  up: 87,
+  down: 83,
+  left: 65,
+  right: 68
+}
+
+/* ====================== */
+/*        Classes!        */
+/* ====================== */
+
 function Point(x, y){
   this.x = x;
   this.y = y;
@@ -25,10 +36,12 @@ function Snake(initLength, spawn){
   if (spawn.x < initLength) {
     for (var i = 0; i < initLength; i++) {
       this.array.push(new Point(spawn.x + i, spawn.y));
+      this.velocity = new Point(-1, 0);
     }
   } else {
     for (var i = 0; i < initLength; i++) {
       this.array.push(new Point(spawn.x - i, spawn.y));
+      this.velocity = new Point(1, 0);
     }
   }
   this.initLength = initLength;
@@ -38,9 +51,9 @@ function Snake(initLength, spawn){
   } //Cut off the array to the initial length
 }
 
-function Game(canvas, fps, snake, options){
+function Game(canvas, tps, snake, options){
   //Constructor
-  this.fps = fps;
+  this.tps = tps;
   this.canvas = canvas;
   this.ctx = canvas.getContext('2d');
   this.snake = snake;
@@ -54,7 +67,7 @@ function Game(canvas, fps, snake, options){
   this.draw = function(){
     //Draw to the canvas
     //First Clear the background!
-    this.ctx.clearRect(0, 0, grid.width, grid.height);
+    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     //Next draw to canvas
     //Draw the snake
@@ -80,11 +93,68 @@ function Game(canvas, fps, snake, options){
       snake.array[0].x * cell.x, snake.array[0].y * cell.y,
       cell.x, cell.y
     );
+  }
 
+  //Refresh method that moves the game forward!
+  this.tick = function(){
+    //this.snake.velocity
+    for (var i = snake.array.length - 1; i > 0; i--) {
+      snake.array[i] = snake.array[i - 1];
+    }
+
+    let newPos = new Point(
+      snake.array[0].x + snake.velocity.x,
+      snake.array[0].y + snake.velocity.y
+    );
+
+    //Check for x overflow
+    if (newPos.x < 0) newPos.x = grid.width
+    else if (newPos.x > 31) newPos.x = 0;
+
+    //Check for y overflow
+    if (newPos.y < 0) newPos.y = grid.height
+    else if (newPos.y > 31) newPos.y = 0;
+
+    //Set new snake.array[0]
+    snake.array[0] = newPos;
   }
 
   this.checkCollision = function(){
     //Check for snake collision with itself
     return ; //Returns a boolean whether to restart or not!
+  }
+}
+
+/* ====================== */
+/*      Interaction!      */
+/* ====================== */
+
+window.onload = function(){
+  var game = new Game(document.getElementById('canvas'), 5, new Snake(3, new Point(1, 2)), {});
+
+  setInterval(function(){
+    game.tick();
+    game.draw();
+  }, 1000 / game.tps);
+
+  document.addEventListener('keyup', changeDir);
+  document.addEventListener('keydown', changeDir);
+  function changeDir(e){
+    switch (e.keyCode) {
+      case keybinds.up:
+        game.snake.velocity.y === 1 ? true : game.snake.velocity = new Point(0, -1);
+        break;
+      case keybinds.down:
+        game.snake.velocity.y === -1 ? true : game.snake.velocity = new Point(0, 1);
+        break;
+      case keybinds.left:
+        game.snake.velocity.x === 1 ? true : game.snake.velocity = new Point(-1, 0);
+        break;
+      case keybinds.right:
+        game.snake.velocity.x === -1 ? true : game.snake.velocity = new Point(1, 0);
+        break;
+      default:
+
+    }
   }
 }
