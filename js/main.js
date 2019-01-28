@@ -2,7 +2,7 @@
 /*      Definitions!      */
 /* ====================== */
 
-const fps = 60; //frames per second. AKA number of times the timer executes per second!
+const tps = 10; //frames per second. AKA number of times the timer executes per second!
 const spawnlength = 3;
 const grid = {
   width: 31,
@@ -11,7 +11,8 @@ const grid = {
 
 const color = {
   p1h: "#44891A",
-  p1t: "#A3CE27"
+  p1t: "#A3CE27",
+  pellet: "#BE2633"
 }
 
 const keybinds = {
@@ -47,7 +48,7 @@ function Snake(initLength, spawn){
   this.initLength = initLength;
 
   this.reset = function(){
-    this.array.slice(0, initLength + 1);
+    this.array = this.array.slice(0, this.initLength);
   } //Cut off the array to the initial length
 }
 
@@ -60,9 +61,12 @@ function Game(canvas, tps, snake, options){
   this.options = options;
   options.pvp ? this.options.pvp = options.pvp : this.options.pvp = true;
 
-  this.restart = function(string){
-    //Restart the game
+  //Generate Pellet
+  this.generatePellet = function(){
+    this.pellet = new Point(Math.floor(Math.random() * 32), Math.floor(Math.random() * 32));
   }
+
+  this.generatePellet();
 
   this.draw = function(){
     //Draw to the canvas
@@ -81,7 +85,7 @@ function Game(canvas, tps, snake, options){
 
     for (var i = 0; i < snake.array.length; i++) {
       this.ctx.fillRect(
-        snake.array[i].x * cell.x, snake.array[i].y * cell.y,
+        this.snake.array[i].x * cell.x, this.snake.array[i].y * cell.y,
         cell.x, cell.y
       );
     }
@@ -90,21 +94,39 @@ function Game(canvas, tps, snake, options){
     this.ctx.fillStyle = color.p1h; //Green
 
     this.ctx.fillRect(
-      snake.array[0].x * cell.x, snake.array[0].y * cell.y,
+      this.snake.array[0].x * cell.x, this.snake.array[0].y * cell.y,
+      cell.x, cell.y
+    );
+
+    this.ctx.fillStyle = color.pellet;
+    //draw the Pellet
+    this.ctx.fillRect(
+      this.pellet.x * cell.x, this.pellet.y * cell.y,
       cell.x, cell.y
     );
   }
 
   //Refresh method that moves the game forward!
   this.tick = function(){
-    //this.snake.velocity
+
+
+    //Shift the array!
+
+    let lastIndex = this.snake.array[this.snake.array.length - 1];
+
     for (var i = snake.array.length - 1; i > 0; i--) {
-      snake.array[i] = snake.array[i - 1];
+      this.snake.array[i] = this.snake.array[i - 1];
+    }
+
+    //Check for pellet collision
+    if (this.snake.array[0].x == this.pellet.x && this.snake.array[0].y == this.pellet.y){
+      this.snake.array.push(lastIndex);
+      this.generatePellet();
     }
 
     let newPos = new Point(
-      snake.array[0].x + snake.velocity.x,
-      snake.array[0].y + snake.velocity.y
+      this.snake.array[0].x + this.snake.velocity.x,
+      this.snake.array[0].y + this.snake.velocity.y
     );
 
     //Check for x overflow
@@ -116,12 +138,14 @@ function Game(canvas, tps, snake, options){
     else if (newPos.y > 31) newPos.y = 0;
 
     //Set new snake.array[0]
-    snake.array[0] = newPos;
-  }
+    this.snake.array[0] = newPos;
 
-  this.checkCollision = function(){
-    //Check for snake collision with itself
-    return ; //Returns a boolean whether to restart or not!
+    //check tail collision
+    for (var i = 0; i < this.snake.array.length; i++) {
+      if (i > 0 && this.snake.array[0].x === snake.array[i].x && this.snake.array[0].y === this.snake.array[i].y) {
+        this.snake.reset();
+      }
+    }
   }
 }
 
@@ -130,7 +154,7 @@ function Game(canvas, tps, snake, options){
 /* ====================== */
 
 window.onload = function(){
-  var game = new Game(document.getElementById('canvas'), 5, new Snake(3, new Point(1, 2)), {});
+  var game = new Game(document.getElementById('canvas'), tps, new Snake(3, new Point(1, 2)), {});
 
   setInterval(function(){
     game.tick();
