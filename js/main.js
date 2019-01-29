@@ -9,18 +9,34 @@ const grid = {
   height: 31,
 };
 
+const speedUp = false;
+
 const color = {
-  p1h: "#44891A",
-  p1t: "#A3CE27",
+  player: [
+    {
+      h: "#44891A",
+      t: "#A3CE27"
+    },
+    {
+      h: '#005784',
+      t: '#31A2F2'
+    }
+  ],
   pellet: "#BE2633"
 }
 
-const keybinds = {
+const keybinds = [{
   up: 87,
   down: 83,
   left: 65,
   right: 68
-}
+},
+{
+  up: 38,
+  down: 40,
+  left: 37,
+  right: 39
+}];
 
 /* ====================== */
 /*        Classes!        */
@@ -52,14 +68,13 @@ function Snake(initLength, spawn){
   } //Cut off the array to the initial length
 }
 
-function Game(canvas, tps, snake, options){
+function Game(canvas, tps, snakes, colorPallet){
   //Constructor
   this.tps = tps;
   this.canvas = canvas;
   this.ctx = canvas.getContext('2d');
-  this.snake = snake;
-  this.options = options;
-  options.pvp ? this.options.pvp = options.pvp : this.options.pvp = true;
+  this.snake = snakes; //Multiple snakes!
+  this.colorPallet = colorPallet;
 
   //Generate Pellet
   this.generatePellet = function(){
@@ -74,29 +89,31 @@ function Game(canvas, tps, snake, options){
     this.ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     //Next draw to canvas
-    //Draw the snake
-    let cell = new Point(
-      Math.floor(this.canvas.width / grid.width),
-      Math.floor(this.canvas.height / grid.height)
-    );
+    for (var a = 0; a < this.snake.length; a++) {
+      //Draw the snake
+      var cell = new Point(
+        Math.floor(this.canvas.width / grid.width),
+        Math.floor(this.canvas.height / grid.height)
+      );
 
-    //Draw trail
-    this.ctx.fillStyle = color.p1t; //Lime
+      //Draw trail
+      this.ctx.fillStyle = color.player[a].t; //Lime
 
-    for (var i = 0; i < snake.array.length; i++) {
+      for (var i = 0; i < this.snake[a].array.length; i++) {
+        this.ctx.fillRect(
+          this.snake[a].array[i].x * cell.x, this.snake[a].array[i].y * cell.y,
+          cell.x, cell.y
+        );
+      }
+
+      //Draw head
+      this.ctx.fillStyle = color.player[a].h; //Green
+
       this.ctx.fillRect(
-        this.snake.array[i].x * cell.x, this.snake.array[i].y * cell.y,
+        this.snake[a].array[0].x * cell.x, this.snake[a].array[0].y * cell.y,
         cell.x, cell.y
       );
     }
-
-    //Draw head
-    this.ctx.fillStyle = color.p1h; //Green
-
-    this.ctx.fillRect(
-      this.snake.array[0].x * cell.x, this.snake.array[0].y * cell.y,
-      cell.x, cell.y
-    );
 
     this.ctx.fillStyle = color.pellet;
     //draw the Pellet
@@ -108,42 +125,41 @@ function Game(canvas, tps, snake, options){
 
   //Refresh method that moves the game forward!
   this.tick = function(){
+    for (var a = 0; a < this.snake.length; a++) { //Do for all snakes
+      //Shift the array!
+      let lastIndex = this.snake[a].array[this.snake[a].array.length - 1];
 
+      for (var i = this.snake[a].array.length - 1; i > 0; i--) {
+        this.snake[a].array[i] = this.snake[a].array[i - 1];
+      }
 
-    //Shift the array!
+      //Check for pellet collision
+      if (this.snake[a].array[0].x == this.pellet.x && this.snake[a].array[0].y == this.pellet.y){
+        this.snake[a].array.push(lastIndex);
+        this.generatePellet();
+      }
 
-    let lastIndex = this.snake.array[this.snake.array.length - 1];
+      let newPos = new Point(
+        this.snake[a].array[0].x + this.snake[a].velocity.x,
+        this.snake[a].array[0].y + this.snake[a].velocity.y
+      );
 
-    for (var i = snake.array.length - 1; i > 0; i--) {
-      this.snake.array[i] = this.snake.array[i - 1];
-    }
+      //Check for x overflow
+      if (newPos.x < 0) newPos.x = grid.width
+      else if (newPos.x > 31) newPos.x = 0;
 
-    //Check for pellet collision
-    if (this.snake.array[0].x == this.pellet.x && this.snake.array[0].y == this.pellet.y){
-      this.snake.array.push(lastIndex);
-      this.generatePellet();
-    }
+      //Check for y overflow
+      if (newPos.y < 0) newPos.y = grid.height
+      else if (newPos.y > 31) newPos.y = 0;
 
-    let newPos = new Point(
-      this.snake.array[0].x + this.snake.velocity.x,
-      this.snake.array[0].y + this.snake.velocity.y
-    );
+      //Set new snake.array[0]
+      this.snake[a].array[0] = newPos;
 
-    //Check for x overflow
-    if (newPos.x < 0) newPos.x = grid.width
-    else if (newPos.x > 31) newPos.x = 0;
-
-    //Check for y overflow
-    if (newPos.y < 0) newPos.y = grid.height
-    else if (newPos.y > 31) newPos.y = 0;
-
-    //Set new snake.array[0]
-    this.snake.array[0] = newPos;
-
-    //check tail collision
-    for (var i = 0; i < this.snake.array.length; i++) {
-      if (i > 0 && this.snake.array[0].x === snake.array[i].x && this.snake.array[0].y === this.snake.array[i].y) {
-        this.snake.reset();
+      //check tail collision
+      for (var i = 0; i < this.snake[a].array.length; i++) {
+        if (i > 0 && this.snake[a].array[0].x === this.snake[a].array[i].x && this.snake[a].array[0].y === this.snake[a].array[i].y) {
+          this.snake[a].reset();
+        }
       }
     }
   }
@@ -154,7 +170,7 @@ function Game(canvas, tps, snake, options){
 /* ====================== */
 
 window.onload = function(){
-  var game = new Game(document.getElementById('canvas'), tps, new Snake(3, new Point(1, 2)), {});
+  var game = new Game(document.getElementById('canvas'), tps, [new Snake(3, new Point(1, 2)), new Snake(3, new Point(1, 5))], color);
 
   setInterval(function(){
     game.tick();
@@ -164,29 +180,38 @@ window.onload = function(){
   document.addEventListener('keyup', changeDir);
   document.addEventListener('keydown', changeDir);
   function changeDir(e){
-    switch (e.keyCode) {
-      case keybinds.up:
-        game.snake.velocity.y === 1 ? true : game.snake.velocity = new Point(0, -1);
-        game.tick();
-        game.draw();
-        break;
-      case keybinds.down:
-        game.snake.velocity.y === -1 ? true : game.snake.velocity = new Point(0, 1);
-        game.tick();
-        game.draw();
-        break;
-      case keybinds.left:
-        game.snake.velocity.x === 1 ? true : game.snake.velocity = new Point(-1, 0);
-        game.tick();
-        game.draw();
-        break;
-      case keybinds.right:
-        game.snake.velocity.x === -1 ? true : game.snake.velocity = new Point(1, 0);
-        game.tick();
-        game.draw();
-        break;
-      default:
-
+    for (var i = 0; i < keybinds.length; i++) {
+      switch (e.keyCode) {
+        case keybinds[i].up:
+          game.snake[i].velocity.y === 1 ? true : game.snake[i].velocity = new Point(0, -1);
+          if (speedUp) {
+            game.tick();
+            game.draw();
+          }
+          break;
+        case keybinds[i].down:
+          game.snake[i].velocity.y === -1 ? true : game.snake[i].velocity = new Point(0, 1);
+          if (speedUp) {
+            game.tick();
+            game.draw();
+          }
+          break;
+        case keybinds[i].left:
+          game.snake[i].velocity.x === 1 ? true : game.snake[i].velocity = new Point(-1, 0);
+          if (speedUp) {
+            game.tick();
+            game.draw();
+          }
+          break;
+        case keybinds[i].right:
+          game.snake[i].velocity.x === -1 ? true : game.snake[i].velocity = new Point(1, 0);
+          if (speedUp) {
+            game.tick();
+            game.draw();
+          }
+          break;
+        default:
+      }
     }
   }
 }
