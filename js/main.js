@@ -259,7 +259,7 @@ window.onload = function(){
     players.setAttribute('type', 'number');
     players.setAttribute('min', '1');
     players.setAttribute('max', '5');
-    players.setAttribute('value', '1');
+    players.setAttribute('value', '2');
 
     let next = document.createElement('INPUT');
     next.setAttribute('type', 'button');
