@@ -167,15 +167,23 @@ window.onload = function(){
     switch (e.keyCode) {
       case keybinds.up:
         game.snake.velocity.y === 1 ? true : game.snake.velocity = new Point(0, -1);
+        game.tick();
+        game.draw();
         break;
       case keybinds.down:
         game.snake.velocity.y === -1 ? true : game.snake.velocity = new Point(0, 1);
+        game.tick();
+        game.draw();
         break;
       case keybinds.left:
         game.snake.velocity.x === 1 ? true : game.snake.velocity = new Point(-1, 0);
+        game.tick();
+        game.draw();
         break;
       case keybinds.right:
         game.snake.velocity.x === -1 ? true : game.snake.velocity = new Point(1, 0);
+        game.tick();
+        game.draw();
         break;
       default:
 
