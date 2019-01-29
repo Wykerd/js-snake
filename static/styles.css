@@ -18,12 +18,6 @@
   border: 2px solid #BE2633;
 }
 
-#menu input[type='button']:hover {
-  margin-left: 8px;
-  border: 4px solid #BE2633;
-  padding: 6px;
-}
-
 #menu input:focus {
   border: 4px solid #E06F8B;
   padding: 6px;
@@ -41,7 +35,7 @@
 
 #gamemode input:hover {
   border: 5px solid #B2DCEF !important;
-  padding: 7px;
+  padding: 7px !important;
   background-color: #A3CE27 !important;
 }
 

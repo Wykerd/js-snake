@@ -40,16 +40,34 @@ var color = { //default color pallet
 }
 
 var keybinds = [{
-  up: 87,
-  down: 83,
-  left: 65,
-  right: 68
+  up: 87, //W
+  down: 83, //S
+  left: 65, //A
+  right: 68 //D
 },
 {
-  up: 38,
-  down: 40,
-  left: 37,
-  right: 39
+  up: 38, //Key Up
+  down: 40, //key Down
+  left: 37, //Key Left
+  right: 39 //Key Right
+},
+{
+  up: 104, //Numpad 8
+  down: 98,//Numpad 2
+  left: 100,//Numpad 4
+  right: 102//Numpad 6
+},
+{
+  up: 76, //L
+  down: 18, //Alt
+  left: 188,//< (,)
+  right: 190 //> (.)
+},
+{
+  up: 71, //G
+  down: 66, //B
+  left: 86, //V
+  right: 78 //N
 }];
 
 /* ====================== */
