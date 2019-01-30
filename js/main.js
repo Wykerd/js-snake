@@ -5,8 +5,8 @@
 var tps = 10; //frames per second. AKA number of times the timer executes per second!
 const spawnlength = 3;
 var grid = {
-  width: 31,
-  height: 31,
+  width: 63,
+  height: 63,
 };
 
 var game = {};
@@ -110,7 +110,7 @@ function Game(canvas, tps, snakes, colorPallet){
 
   //Generate Pellet
   this.generatePellet = function(){
-    this.pellet = new Point(Math.floor(Math.random() * 32), Math.floor(Math.random() * 32));
+    this.pellet = new Point(Math.floor(Math.random() * (grid.width + 1)), Math.floor(Math.random() * (grid.height + 1)));
   }
 
   this.generatePellet();
@@ -178,11 +178,11 @@ function Game(canvas, tps, snakes, colorPallet){
 
       //Check for x overflow
       if (newPos.x < 0) newPos.x = grid.width
-      else if (newPos.x > 31) newPos.x = 0;
+      else if (newPos.x > grid.width) newPos.x = 0;
 
       //Check for y overflow
       if (newPos.y < 0) newPos.y = grid.height
-      else if (newPos.y > 31) newPos.y = 0;
+      else if (newPos.y > grid.height) newPos.y = 0;
 
       //Set new snake.array[0]
       this.snake[a].array[0] = newPos;
