@@ -2,7 +2,7 @@
 /*      Definitions!      */
 /* ====================== */
 
-var tps = 10; //frames per second. AKA number of times the timer executes per second!
+var tps = 30; //frames per second. AKA number of times the timer executes per second!
 const spawnlength = 3;
 var grid = {
   width: 31,
