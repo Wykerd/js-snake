@@ -40,20 +40,20 @@ function predictVelocity(){
 
 
   this.bestY = function(){
-    console.log('calculating best y velocity');
     let res = {
       up: (grid.height + 1) * (grid.width + 1) + 1,
       down: (grid.height + 1) * (grid.width + 1)
     };
     for (var i = 1; i < arrS.length; i++) {
-      if (arrS[i].x === arrS[0].x){
+      if (arrS[i].y === arrS[0].y){
         if (arrS[i].x > arrS[0].x) res.down = i
         else if (arrS[i].x < arrS[0].x) res.up = i
       }
     }
-    if (res.up > res.down && ov.y !== 1) return new Point(0, -1)
-    else if (res.up < res.down && ov.y !== -1) return new Point(0, 1)
-    else {return ov;console.log('YOTEEEEEEEEEEEE')}
+    console.log(`Y: ${res.up}, ${res.down}`);
+    if (res.up > res.down && ov.y !== 1) {console.log('picked up'); return new Point(0, -1)}
+    else if (res.up < res.down && ov.y !== -1) {console.log('picked down'); return new Point(0, 1)}
+    else {console.log('YOTEEEEEEEEEEEE'); return ov;}
   }
 
   if (v.y === 0) { //Moving in x direction
@@ -75,20 +75,20 @@ function predictVelocity(){
   }
 
   this.bestX = function(){
-    console.log('calculating best x velocity');
     let res = {
       left: (grid.height + 1) * (grid.width + 1) + 1, //Unreachable numbers
       right: (grid.height + 1) * (grid.width + 1)
     };
     for (var i = 1; i < arrS.length; i++) {
-      if (arrS[i].y === arrS[0].y){
+      if (arrS[i].x === arrS[0].x){
         if (arrS[i].y > arrS[0].y) res.right = i
         else if (arrS[i].y < arrS[0].y) res.left = i
       }
     }
-    if (res.left > res.right && ov.x !== 1) return new Point(-1, 0)
-    else if (res.left < res.right && ov.x !== -1) return new Point(1, 0)
-    else {return ov;console.log('REEEEEEEEEEE')};
+    console.log(`X: ${res.left}, ${res.right}`);
+    if (res.left > res.right && ov.x !== 1) {console.log('picked left'); return new Point(-1, 0)}
+    else if (res.left < res.right && ov.x !== -1) {console.log('picked right'); return new Point(1, 0)}
+    else {console.log('REEEEEEEEEEE'); return ov};
   }
 
   if (v.x === 0) { //Moving in y direction

@@ -97,6 +97,7 @@ function Snake(initLength, spawn){
 
   this.reset = function(){
     this.array = this.array.slice(0, this.initLength);
+    console.log('ENDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDd');
   } //Cut off the array to the initial length
 }
 
