@@ -1,5 +1,5 @@
 #canvas {
-  display: none;
+  display: block;
   margin: auto;
   border: 5px solid green;
 }
